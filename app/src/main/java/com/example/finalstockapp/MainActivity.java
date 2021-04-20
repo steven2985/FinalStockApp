@@ -1,6 +1,10 @@
 package com.example.finalstockapp;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.navigation.NavController;
+import androidx.navigation.Navigation;
+import androidx.navigation.ui.AppBarConfiguration;
+import androidx.navigation.ui.NavigationUI;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -10,55 +14,25 @@ import com.android.volley.RequestQueue;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.Volley;
+import com.google.android.material.bottomnavigation.BottomNavigationView;
 
 import java.util.ArrayList;
 
 public class MainActivity extends AppCompatActivity {
-    private final String[] stocks = {"IBM","AAPL","GOOGL","AMZN","TSLA"};
-    private ArrayList<Stock> theStocks;
-    RecyclerView example;
-    StockRecyclerAdapter exampleAdapter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
-        theStocks = new ArrayList<Stock>();
-        example = findViewById(R.id.recycler);
 
-        for(String s : stocks) {
-            String url = "https://www.alphavantage.co/query?function=GLOBAL_QUOTE&symbol={{REPLACE_KEY}}&apikey= {}".replace("{{REPLACE_KEY}}",s);
-            RequestQueue queue = Volley.newRequestQueue(this);
-
-
-            GsonRequest<GlobalQuote> req = new GsonRequest<GlobalQuote>(url, GlobalQuote.class, null, new Response.Listener<GlobalQuote>() {
-                @Override
-                public void onResponse(GlobalQuote response) {
-
-                    System.out.println("Successful Response");
-                    System.out.println(response.getGlobalQuote().getSymbol());
-                    theStocks.add(response.getGlobalQuote());
-
-                    if(theStocks.size() == stocks.length){
-                        doView();
-                    }
-
-                }
-            }, new Response.ErrorListener() {
-                @Override
-                public void onErrorResponse(VolleyError error) {
-                    System.out.println("That didn't work!");
-                }
-            });
-
-            queue.add(req);
-        }
-
-    }
-
-    private void doView(){
-        exampleAdapter = new StockRecyclerAdapter(theStocks);
-        example.setAdapter(exampleAdapter);
-        example.setLayoutManager(new LinearLayoutManager(this));
+        setContentView(R.layout.activity_bottom);
+        BottomNavigationView navView = findViewById(R.id.nav_view);
+        // Passing each menu ID as a set of Ids because each
+        // menu should be considered as top level destinations.
+        AppBarConfiguration appBarConfiguration = new AppBarConfiguration.Builder(
+                R.id.navigation_home, R.id.navigation_dashboard, R.id.navigation_notifications)
+                .build();
+        NavController navController = Navigation.findNavController(this, R.id.nav_host_fragment);
+        NavigationUI.setupActionBarWithNavController(this, navController, appBarConfiguration);
+        NavigationUI.setupWithNavController(navView, navController);
     }
 }
